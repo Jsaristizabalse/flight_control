@@ -17,40 +17,36 @@ void loop() {
   
   printData();
   
-  delay(50);
+  delay(100);
 }
-
-
-
-
 
 
 
 void setupMPU() {
   Wire.beginTransmission(MPU_ADDRESS);
-  Wire.write(0x1A);
-  Wire.write(0x05);
+  Wire.write(CONFIG_REG);
+  Wire.write(MPU6050_BAND_10_HZ);// Low pass filter of 10 hz
   Wire.endTransmission();
 
   Wire.beginTransmission(MPU_ADDRESS);
-  Wire.write(0x6B);
-  Wire.write(0x00);
+  Wire.write(POWR_MGMT);
+  Wire.write(0x00);  //sleep register to 0
   Wire.endTransmission();
 
   Wire.beginTransmission(MPU_ADDRESS);
-  Wire.write(0x1B);
-  Wire.write(0x08);
+  Wire.write(GYRO_CONFIG);
+  Wire.write(MPU6050_RANGE_500_DEG);
   Wire.endTransmission();
 
   Wire.beginTransmission(MPU_ADDRESS);
-  Wire.write(0x1C);
-  Wire.write(0x24);
+  Wire.write(ACCEL_CONFIG);
+  Wire.write(MPU6050_RANGE_16_G);
   Wire.endTransmission();
 
-  Wire.beginTransmission(MPU_ADDRESS);
-  Wire.write(0x1D);
-  Wire.write(0x24);
-  Wire.endTransmission();
+  // Wire.beginTransmission(MPU_ADDRESS);
+  // Wire.write(0x1D);
+  // Wire.write(0x24);
+  // Wire.endTransmission();
 }
 
 void recordAccelRegisters() {
