@@ -5,17 +5,17 @@
 
 #define DATA_FRQ 1000
 
-const int ESTOPIN   = 9;
+const int ESTOPIN   = 13;
 const int UP_PIN    = 11;
 const int DOWN_PIN  = 10;
-const int COMM      = 12;
+const int COMM      = 9;
 
 
 const int builtinLED   = 13;
 
 //define variables
 // altura a partir de la cual es seguro abrir el paracaidas
-float lockAlt = 2.0;
+float lockAlt = 20.0;
 
 
 float previousAlt;
@@ -93,9 +93,9 @@ void readData(){
   Serial.print(realAlt);
   Serial.println(" meters");
   
-  Serial.print("mean Altitude = ");
-  Serial.print(meanAlt);
-  Serial.println(" meters");
+  // Serial.print("mean Altitude = ");
+  // Serial.print(meanAlt);
+  // Serial.println(" meters");
   //printData();
 
 }
@@ -126,7 +126,7 @@ void verifyAlt(){
     digitalWrite(DOWN_PIN,HIGH);
     //condicion para lanzar el paracaidas
     //si la altura empieza a disminuir
-    if(realAlt < meanAlt && apogeeLCK && estopinFlag){
+    if(realAlt < apogee && apogeeLCK && estopinFlag){
       fireParachute();
     }
   }

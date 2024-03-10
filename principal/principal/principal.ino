@@ -14,15 +14,16 @@ Adafruit_BMP085 bmp;
 
 
 //define PINS
-const int ESTOPIN   = 9;
+const int ESTOPIN   = 12;
 
 const int UP_PIN    = 11;
 const int DOWN_PIN  = 10;
-const int COMM      = 12;
+
+const int builtinLED   = 13;
 
 
 //define variables
-float lockAlt = 2.0;
+float lockAlt = 20;
 
 float previousAlt;
 float initAlt = 0;
@@ -39,7 +40,6 @@ float pressureSea;
 int estopinState = 0;
 bool estopState = LOW;
 bool apogeeLCK = LOW;
-const int builtinLED   = 13;
   
 void setup() {
 
@@ -48,7 +48,7 @@ void setup() {
   pinMode(UP_PIN, OUTPUT);
   pinMode(DOWN_PIN, OUTPUT);
   pinMode(ESTOPIN, OUTPUT);
-  pinMode(COMM, OUTPUT);
+  
   pinMode(builtinLED, OUTPUT);
 
 
@@ -65,8 +65,9 @@ void setup() {
   
 void loop() {
   readData();
-  verifyAlt();
-  i2cCOMM();
+  // verifyAlt();
+  // i2cCOMM();
+  delay(DATA_FRQ);
 
 
 }
@@ -80,37 +81,50 @@ void readData(){
   pressureSea = bmp.readSealevelPressure();
   temp = bmp.readTemperature();
   
+  
   meanAlt = (previousAlt+realAlt)/2;
+
   
   
   if (initAlt == 0.0){
     initAlt = realAlt;
+    previousAlt = realAlt;
   }
 
-  Serial.print("Init Altitude = ");
-  Serial.print(initAlt);
-  Serial.println(" meters");
+    //guardamos la altura maxima
+  if(realAlt > maxAlt){
+    maxAlt = realAlt;
+  }
+
+  // Serial.print("Init Altitude = ");
+  // Serial.print(initAlt);
+  // Serial.println(" meters");
 
   Serial.print("real Altitude = ");
   Serial.print(realAlt);
   Serial.println(" meters");
   
+  Serial.print("previous Altitude = ");
+  Serial.print(previousAlt);
+  Serial.println(" meters");
+
   Serial.print("mean Altitude = ");
   Serial.print(meanAlt);
   Serial.println(" meters");
-  //printData();
 
+  Serial.print("MAX Altitude = ");
+  Serial.print(maxAlt);
+  Serial.println(" meters");
+
+
+  verifyAlt();
+
+  previousAlt = realAlt;
+  // printData();
 }
 
 void printData(){
-  Serial.print("Temperature = ");
-  Serial.print(temp);
-  Serial.println(" *C");
-  
-  Serial.print("Pressure = ");
-  Serial.print(pressure);
-  Serial.println(" Pa");
-  
+
   // Calculate altitude assuming 'standard' barometric
   // pressure of 1013.25 millibar = 101325 Pascal
   Serial.print("Altitude = ");
@@ -130,16 +144,10 @@ void printData(){
   Serial.println(" meters");
   
   Serial.println();
-  delay(DATA_FRQ);
-
 }
 
 
 void verifyAlt(){
-  //actualizamos la altura anterior
-  previousAlt = realAlt;
-
-
   //condicion para desbloquear el estopin
   //la altitud media debe superar 400mts
   float apogee = initAlt + lockAlt;
@@ -150,27 +158,20 @@ void verifyAlt(){
 
 
   //SUBIENDO
-  if(realAlt > (meanAlt)){
+  if(realAlt > (previousAlt)){
     digitalWrite(UP_PIN,HIGH);
     digitalWrite(DOWN_PIN,LOW);
-    }//BAJANDO
-  else if (realAlt < meanAlt){
-    digitalWrite(UP_PIN,LOW);
+    }
+  //BAJANDO
+  else if (realAlt < previousAlt){
     digitalWrite(DOWN_PIN,HIGH);
-    //condicion para lanzar el paracaidas
     //si la altura empieza a disminuir
-    if(realAlt < meanAlt && apogeeLCK){
+    if(realAlt < apogee && apogeeLCK){
       fireParachute();
     }
   }
 
 
-  //guardamos la altura maxima
-  if(realAlt > maxAlt){
-    maxAlt = realAlt;
-  }
-
-  delay(1000);
 }
 
 
@@ -180,7 +181,7 @@ void verifyAlt(){
 void fireParachute(){
   digitalWrite(builtinLED, HIGH);
   digitalWrite(ESTOPIN, HIGH);
-  delay(5000);
+  delay(2000);
   digitalWrite(builtinLED, LOW);
   digitalWrite(ESTOPIN, HIGH);
 }
