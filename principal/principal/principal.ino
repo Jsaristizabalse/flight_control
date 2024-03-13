@@ -1,6 +1,3 @@
-#include <ArduinoJson.h>
-#include <ArduinoJson.hpp>
-
 #include <Adafruit_BMP085.h>
 
 #include <Wire.h>
@@ -10,7 +7,7 @@
 
 Adafruit_BMP085 bmp;
 
-#define DATA_FRQ 1000
+#define DATA_FRQ 250
 
 
 //define PINS
@@ -108,9 +105,9 @@ void readData(){
   Serial.print(previousAlt);
   Serial.println(" meters");
 
-  Serial.print("mean Altitude = ");
-  Serial.print(meanAlt);
-  Serial.println(" meters");
+  Serial.print("lock = ");
+  Serial.print(apogeeLCK);
+  Serial.println(" value");
 
   Serial.print("MAX Altitude = ");
   Serial.print(maxAlt);

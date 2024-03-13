@@ -3,7 +3,7 @@
 #define SLAVE_ADDR 9
 #define ANSWERSIZE 5
 
-#define DATA_FRQ 1000
+#define DATA_FRQ 250
 
 const int ESTOPIN   = 13;
 const int UP_PIN    = 11;
